@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class ValueIteration():
     def __init__(self, states_n, actions_n, P, gamma):
         self.states_n = states_n
@@ -18,8 +17,19 @@ class ValueIteration():
 
     def render(self):
         print("Values: {}, Policy: {}".format(self.values, self.policy))
+        print("Mean: ", round(sum(self.values)/len(self.values), 5))
 
-    def solve(self, policy_evaluations, iterations: int, delta: float, method: str):
+    def solve(self, policy_evaluations, iterations: int, delta: float, method: str, init_policy=None, init_values=None):
+        if init_policy is None:
+            self.policy = np.random.randint(0, self.actions_n, self.states_n)
+        else:
+            self.policy = init_policy
+        
+        if init_values is None:
+            self.values = np.random.rand(self.states_n)
+        else:
+            self.values = init_values
+
         if method == 'valiter':
             for _ in range(iterations):
                 for s in range(self.states_n):
