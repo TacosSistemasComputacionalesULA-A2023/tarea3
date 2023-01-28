@@ -1,0 +1,3 @@
+gym==0.26.2
+numpy==1.23.5
+https://github.com/jesuspangulo/gym_environments/archive/refs/heads/main.zip
