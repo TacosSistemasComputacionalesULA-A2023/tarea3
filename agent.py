@@ -6,11 +6,17 @@ class ValueIteration():
         self.actions_n = actions_n
         self.P = P
         self.gamma = gamma
-        self.reset()
+        self.reset(np.zeros(self.states_n), np.zeros(self.states_n))
 
-    def reset(self):
-        self.values = np.zeros(self.states_n)
-        self.policy = np.zeros(self.states_n)
+    def reset(self, values, policies):
+        if policies is None:
+            policies = np.random.randint(0, self.actions_n, self.states_n)
+        
+        if values is None:
+            values = np.random.rand(self.states_n)
+        
+        self.values = values
+        self.policy = policies
 
     def get_action(self, state):
         return int(self.policy[state])
@@ -19,16 +25,7 @@ class ValueIteration():
         print("Values: {}, Policy: {}".format(self.values, self.policy))
         print("Mean: ", round(sum(self.values)/len(self.values), 5))
 
-    def solve(self, policy_evaluations, iterations: int, delta: float, method: str, init_policy=None, init_values=None):
-        if init_policy is None:
-            self.policy = np.random.randint(0, self.actions_n, self.states_n)
-        else:
-            self.policy = init_policy
-        
-        if init_values is None:
-            self.values = np.random.rand(self.states_n)
-        else:
-            self.values = init_values
+    def solve(self, policy_evaluations, iterations: int, delta: float, method: str):
 
         if method == 'valiter':
             for _ in range(iterations):
@@ -38,8 +35,8 @@ class ValueIteration():
                               for a in range(self.actions_n)]
                     self.values[s] = max(values)
                     self.policy[s] = np.argmax(np.array(values))
+        
         elif method == 'politer':
-
             for _ in range(iterations):
                 optimal_policy_found = True
                 # policy evaluation
