@@ -20,6 +20,7 @@ fieldnames = [
     "states_values",
     "policies_values",
     "reward",
+    "steps",
 ]
 
 
@@ -56,12 +57,15 @@ def sums(policies, values, averages):
 # run learning process takes the arguments for the agent and runs the specified
 # amount of experiments also while returning summaries from that experiments set.
 def run_learning_process(arguments: agent_arguments):
+    print(str(arguments))
+
     space_num = arguments.env.observation_space.n
 
     average_values = {
         "states_values": [0 for _ in range(space_num)],
         "policies_values": [0 for _ in range(space_num)],
         "reward": 0,
+        "steps": 0,
     }
 
     for _ in range(arguments.experiments):
@@ -87,8 +91,9 @@ def run_learning_process(arguments: agent_arguments):
 
         arguments.env.render()
 
-        reward = 0
+        reward, steps = 0, 0
         while not (terminated or truncated):
+            steps += 1
             action = agent.get_action(observation)
             (
                 observation,
@@ -99,22 +104,21 @@ def run_learning_process(arguments: agent_arguments):
             ) = arguments.env.step(action)
 
         average_values["reward"] += reward
+        if reward == 1.0:
+            average_values["steps"] += steps
         sums(agent.policy, agent.values, average_values)
         arguments.env.close()
+
     for i in range(len(average_values["policies_values"])):
         average_values["policies_values"][i] /= arguments.experiments
-
     for i in range(len(average_values["states_values"])):
         average_values["states_values"][i] /= arguments.experiments
 
     average_values["reward"] /= arguments.experiments
-
+    average_values["steps"] /= arguments.experiments
     average_values["method"] = arguments.method
-
     average_values["iter_num"] = arguments.iterations
-
     average_values["gamma"] = arguments.gamma
-
     average_values["delta"] = arguments.delta
 
     return average_values
